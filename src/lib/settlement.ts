@@ -39,7 +39,8 @@ export function computeShares(expense: Expense): Map<ID, number> {
 
   const shares = new Map<ID, number>();
 
-  // Non-payers absorb extra cents first
+  // Non-payers absorb extra cents first. Giving the payer an extra cent would
+  // mean they both paid more AND owe slightly more — a double-penalty for rounding.
   for (const id of participants) {
     if (id !== paidBy) {
       shares.set(id, remainder > 0 ? base + 1 : base);
@@ -65,6 +66,9 @@ export function computeNetBalances(state: State): Map<ID, number> {
   for (const expense of state.expenses) {
     const shares = computeShares(expense);
 
+    // Two-step accounting: first give the payer full credit for fronting the money,
+    // then debit each participant (including the payer if they're in the list) their
+    // share. The payer's net ends up as (amountCents − own share) = what others owe them.
     balances.set(expense.paidBy, (balances.get(expense.paidBy) ?? 0) + expense.amountCents);
 
     for (const [id, share] of shares) {

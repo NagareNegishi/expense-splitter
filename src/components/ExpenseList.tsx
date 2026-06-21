@@ -9,9 +9,10 @@ function centsToDisplay(cents: number): string {
 
 function filterAmount(value: string): string {
   const stripped = value.replace(/[^0-9.]/g, '')
-  // Keep only the first decimal point
   const parts = stripped.split('.')
-  return parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : stripped
+  // Allow only one decimal point, capped at 2 places — parseDollars rounds to cents anyway,
+  // but allowing "10.999" would show a value that differs from what actually gets stored.
+  return parts.length > 1 ? parts[0] + '.' + parts[1].slice(0, 2) : stripped
 }
 
 function filterDescription(value: string): string {
@@ -67,9 +68,13 @@ interface ExpenseFormProps {
 function ExpenseForm({ people, initial, submitLabel, onSubmit, onCancel }: ExpenseFormProps) {
   const [form, setForm] = useState<FormState>(initial)
 
-  // When a new person is added while the form is open, auto-select them as a participant.
+  // Sync the form whenever the people list changes:
+  // - auto-select any newly added person as a participant
+  // - reset paidBy to the first person if the current payer was removed
   useEffect(() => {
     setForm(f => {
+      const currentIds = new Set(people.map(p => p.id))
+
       const next = new Set(f.participants)
       let changed = false
       for (const p of people) {
@@ -78,16 +83,27 @@ function ExpenseForm({ people, initial, submitLabel, onSubmit, onCancel }: Expen
           changed = true
         }
       }
-      return changed ? { ...f, participants: next } : f
+
+      const paidBy = currentIds.has(f.paidBy) ? f.paidBy : (people[0]?.id ?? '')
+      if (paidBy !== f.paidBy) changed = true
+
+      return changed ? { ...f, participants: next, paidBy } : f
     })
   }, [people])
 
   const amountValid = parseDollars(form.amount) !== null
+
+  // Count only participants still in the current people list. Stale IDs from
+  // removed people are cleaned up in handleSubmit, but using form.participants.size
+  // directly would keep the button enabled even when no real participant is checked.
+  const currentPeopleIds = new Set(people.map(p => p.id))
+  const validParticipantCount = [...form.participants].filter(id => currentPeopleIds.has(id)).length
+
   const canSubmit =
     form.description.trim() !== '' &&
     amountValid &&
     form.paidBy !== '' &&
-    form.participants.size > 0
+    validParticipantCount > 0
 
   function toggleParticipant(id: string) {
     setForm(f => {
@@ -277,7 +293,10 @@ export function ExpenseList() {
               <button
                 className="flex h-[30px] w-[30px] items-center justify-center rounded-[8px] border border-line bg-[#fafafa] text-[0.85rem] text-muted hover:bg-[#f0f0f0]"
                 title="Delete"
-                onClick={() => dispatch({ type: 'DELETE_EXPENSE', id: expense.id })}
+                onClick={() => {
+                  if (editingId === expense.id) setEditingId(null)
+                  dispatch({ type: 'DELETE_EXPENSE', id: expense.id })
+                }}
               >
                 ✕
               </button>
