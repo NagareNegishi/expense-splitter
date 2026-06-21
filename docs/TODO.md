@@ -25,10 +25,10 @@ Build order follows CLAUDE.md. Check off each item when it's done.
 - [x] Debt chain: pairwise debts that net out collapse to fewer direct payments
 
 ## 4. State (`src/lib/reducer.ts` + `src/lib/context.tsx`) — §6
-- [ ] `State`, `Action` discriminated union types
-- [ ] Pure reducer (`ADD_PERSON`, `EDIT_PERSON`, `REMOVE_PERSON`, `ADD_EXPENSE`, `EDIT_EXPENSE`, `DELETE_EXPENSE`)
-- [ ] `default` throws with exhaustiveness check (`action satisfies never`)
-- [ ] `AppContext` + `AppProvider` using React 19 `<Context value={...}>` syntax
+- [x] `State`, `Action` discriminated union types
+- [x] Pure reducer (`ADD_PERSON`, `EDIT_PERSON`, `REMOVE_PERSON`, `ADD_EXPENSE`, `EDIT_EXPENSE`, `DELETE_EXPENSE`)
+- [x] `default` throws with exhaustiveness check (`action satisfies never`)
+- [x] `AppContext` + `AppProvider` using React 19 `<Context value={...}>` syntax
 
 ## 5. UI (`src/`) — §11, layout-mockup.html
 - [ ] `App.tsx` — single column, three regions
