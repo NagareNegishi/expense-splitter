@@ -23,8 +23,8 @@ export function Summary() {
 
   if (state.people.length === 0) {
     return (
-      <section className="rounded-[14px] border border-line bg-white p-4">
-        <h2 className="mb-3 mt-0 text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-muted">
+      <section className="rounded-[14px] border border-line bg-white p-5">
+        <h2 className="mb-3 mt-0 border-l-[3px] border-accent pl-3 text-[0.9rem] font-semibold text-ink">
           Summary
         </h2>
         <p className="text-sm text-muted">Add some people and expenses to see who owes what.</p>
@@ -33,14 +33,14 @@ export function Summary() {
   }
 
   return (
-    <section className="rounded-[14px] border border-line bg-white p-4">
-      <h2 className="mb-3 mt-0 text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-muted">
+    <section className="rounded-[14px] border border-line bg-white p-5">
+      <h2 className="mb-3 mt-0 border-b border-line pb-2 text-[0.9rem] font-semibold text-ink">
         Summary
       </h2>
 
       {/* Block 1: per-person net balance */}
       <div>
-        <h3 className="mb-2 mt-0 text-[0.82rem] font-semibold text-ink">
+        <h3 className="mb-2 mt-0 mb-2 mt-0 text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-muted">
           Where everyone stands
         </h3>
         {state.people.map(person => {
@@ -65,7 +65,7 @@ export function Summary() {
 
       {/* Block 2: greedy transaction list (at most n−1 transfers) */}
       <div className="mt-4 border-t border-line pt-[14px]">
-        <h3 className="mb-2 mt-0 text-[0.82rem] font-semibold text-ink">Settle up</h3>
+        <h3 className="mb-2 mt-0 mb-2 mt-0 text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-muted">Settle up</h3>
         {transactions.length === 0 ? (
           <p className="text-sm text-muted">Everyone is settled up.</p>
         ) : (

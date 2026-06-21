@@ -70,9 +70,9 @@ export function PeopleList() {
   return (
     <>
       {/* rounded-[14px]: matches the --radius token from the layout mockup */}
-      <section className="mb-[18px] rounded-[14px] border border-line bg-white p-4">
+      <section className="mb-4 rounded-[14px] border border-line bg-white p-5">
         {/* uppercase tracking-[0.08em]: section label style from mockup */}
-        <h2 className="mb-3 mt-0 text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-muted">
+        <h2 className="mb-3 mt-0 border-l-[3px] border-accent pl-3 text-[0.9rem] font-semibold text-ink">
           People
         </h2>
 
@@ -144,25 +144,23 @@ export function PeopleList() {
           </div>
         ))}
 
-        <div className="mt-3">
-          <div className="flex gap-2">
-            <input
-              className="w-full rounded-[9px] border border-line px-[11px] py-[9px] text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
-              placeholder="New member's name…"
-              value={newName}
-              onChange={e => { setNewName(filterName(e.target.value)); setAddError(null) }}
-              onKeyDown={e => e.key === 'Enter' && addPerson()}
-            />
-            <button
-              className="whitespace-nowrap rounded-[9px] bg-accent px-4 py-[9px] font-semibold text-white hover:brightness-105"
-              onClick={addPerson}
-            >
-              Add
-            </button>
-          </div>
+        <div className="mt-3 flex flex-col gap-2">
+          <input
+            className="w-full rounded-[9px] border border-line px-[11px] py-[9px] text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+            placeholder="New member's name…"
+            value={newName}
+            onChange={e => { setNewName(filterName(e.target.value)); setAddError(null) }}
+            onKeyDown={e => e.key === 'Enter' && addPerson()}
+          />
           {addError && (
-            <p className="mt-[6px] text-[0.8rem] text-owes">{addError}</p>
+            <p className="m-0 text-[0.8rem] text-owes">{addError}</p>
           )}
+          <button
+            className="w-full rounded-[9px] bg-accent py-[9px] font-semibold text-white hover:brightness-105"
+            onClick={addPerson}
+          >
+            Add member
+          </button>
         </div>
       </section>
 

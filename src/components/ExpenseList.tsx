@@ -253,8 +253,8 @@ export function ExpenseList() {
   }
 
   return (
-    <section className="mb-[18px] rounded-[14px] border border-line bg-white p-4">
-      <h2 className="mb-3 mt-0 text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-muted">
+    <section className="mb-4 rounded-[14px] border border-line bg-white p-5">
+      <h2 className="mb-3 mt-0 border-l-[3px] border-accent pl-3 text-[0.9rem] font-semibold text-ink">
         Expenses
       </h2>
 
@@ -275,7 +275,7 @@ export function ExpenseList() {
               <div className="min-w-0 flex-1">
                 <div className="truncate font-medium text-ink">{expense.description}</div>
                 {/* Sub-line format: "Alice paid · split Alice, Bob, Carol" */}
-                <div className="truncate text-[0.8rem] text-muted">
+                <div className="truncate text-[0.85rem] text-[#8a8a90]">
                   {nameOf(expense.paidBy)} paid · split{' '}
                   {expense.participants.map(id => nameOf(id)).join(', ')}
                 </div>

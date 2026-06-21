@@ -8,11 +8,12 @@ function App() {
     <AppProvider>
       <div className="min-h-screen px-4 pb-16 pt-6">
         <div className="mx-auto max-w-[560px]">
-          <header className="mb-6">
-            <h1 className="m-0 text-[1.35rem] font-semibold tracking-tight text-ink">
+          <header className="mb-4 rounded-[14px] border border-line bg-white p-5 text-center">
+            <h1 className="m-0 text-2xl font-bold tracking-tight text-ink">
               Expense Splitter
             </h1>
-            <p className="m-0 mt-1 text-sm text-muted">
+            <div className="mx-auto mt-2 h-[3px] w-12 rounded-full bg-accent" />
+            <p className="m-0 mt-2 text-sm text-muted">
               Record shared expenses, see who owes whom.
             </p>
           </header>
