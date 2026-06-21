@@ -7,6 +7,10 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
+function filterName(value: string): string {
+  return value.replace(/[^a-zA-Z\s\-']/g, '')
+}
+
 /** People section: add, edit, and remove group members with a referential-integrity guard. */
 export function PeopleList() {
   const { state, dispatch } = useAppContext()
@@ -69,7 +73,7 @@ export function PeopleList() {
                 <input
                   className="w-full rounded-[9px] border border-line px-[11px] py-[7px] text-ink focus:outline-none focus:ring-2 focus:ring-accent"
                   value={editName}
-                  onChange={e => setEditName(e.target.value)}
+                  onChange={e => setEditName(filterName(e.target.value))}
                   onKeyDown={e => {
                     if (e.key === 'Enter') commitEdit(person.id)
                     if (e.key === 'Escape') setEditingId(null)
@@ -122,7 +126,7 @@ export function PeopleList() {
             className="w-full rounded-[9px] border border-line px-[11px] py-[9px] text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
             placeholder="Add a person…"
             value={newName}
-            onChange={e => setNewName(e.target.value)}
+            onChange={e => setNewName(filterName(e.target.value))}
             onKeyDown={e => e.key === 'Enter' && addPerson()}
           />
           <button

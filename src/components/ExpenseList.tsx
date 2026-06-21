@@ -7,6 +7,17 @@ function centsToDisplay(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`
 }
 
+function filterAmount(value: string): string {
+  const stripped = value.replace(/[^0-9.]/g, '')
+  // Keep only the first decimal point
+  const parts = stripped.split('.')
+  return parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : stripped
+}
+
+function filterDescription(value: string): string {
+  return value.replace(/[^a-zA-Z0-9\s.,'\-!?&()/#:]/g, '')
+}
+
 /**
  * Parse a dollar-string input to integer cents.
  * Returns null if the value is missing, non-numeric, or not positive.
@@ -107,7 +118,7 @@ function ExpenseForm({ people, initial, submitLabel, onSubmit, onCancel }: Expen
           className={inputClass}
           placeholder="e.g. Dinner"
           value={form.description}
-          onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+          onChange={e => setForm(f => ({ ...f, description: filterDescription(e.target.value) }))}
         />
       </div>
 
@@ -119,7 +130,7 @@ function ExpenseForm({ people, initial, submitLabel, onSubmit, onCancel }: Expen
             placeholder="0.00"
             inputMode="decimal"
             value={form.amount}
-            onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
+            onChange={e => setForm(f => ({ ...f, amount: filterAmount(e.target.value) }))}
           />
         </div>
         <div>
