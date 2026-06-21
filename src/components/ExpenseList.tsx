@@ -329,7 +329,7 @@ export function ExpenseList() {
           />
         </div>
       ) : (
-        <p className="mt-3 text-sm text-muted">Add some people first.</p>
+        <p className="mt-3 text-sm text-muted">Add people to the group first.</p>
       )}
     </section>
   )

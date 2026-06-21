@@ -27,7 +27,7 @@ export function Summary() {
         <h2 className="mb-3 mt-0 text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-muted">
           Summary
         </h2>
-        <p className="text-sm text-muted">Add people and expenses to see who owes whom.</p>
+        <p className="text-sm text-muted">Add some people and expenses to see who owes what.</p>
       </section>
     )
   }

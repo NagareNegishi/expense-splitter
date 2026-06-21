@@ -15,27 +15,44 @@ function filterName(value: string): string {
 export function PeopleList() {
   const { state, dispatch } = useAppContext()
   const [newName, setNewName] = useState('')
+  const [addError, setAddError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
+  const [editError, setEditError] = useState<string | null>(null)
   // null = no dialog; set to the person's id to show the "can't remove" modal
   const [blockedId, setBlockedId] = useState<string | null>(null)
 
   function addPerson() {
     const name = capitalize(newName.trim())
     if (!name) return
+    if (state.people.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+      setAddError(`${name} is already in the group — try adding a last name or nickname.`)
+      return
+    }
     dispatch({ type: 'ADD_PERSON', person: { id: crypto.randomUUID(), name } })
     setNewName('')
+    setAddError(null)
   }
 
   function startEdit(person: Person) {
     setEditingId(person.id)
     setEditName(person.name)
+    setEditError(null)
   }
 
   function commitEdit(id: string) {
     const name = capitalize(editName.trim())
-    if (name) dispatch({ type: 'EDIT_PERSON', id, name })
+    if (!name) {
+      setEditingId(null)
+      return
+    }
+    if (state.people.some(p => p.id !== id && p.name.toLowerCase() === name.toLowerCase())) {
+      setEditError(`${name} is already in the group — try a last name or nickname.`)
+      return
+    }
+    dispatch({ type: 'EDIT_PERSON', id, name })
     setEditingId(null)
+    setEditError(null)
   }
 
   function tryRemove(id: string) {
@@ -63,23 +80,29 @@ export function PeopleList() {
           <div
             key={person.id}
             // Omit bottom border on the last row so it doesn't double up with the add-field's top margin
-            className={`flex items-center gap-[10px] py-[9px] ${
+            // items-start when editing so the buttons stay at the top if an error message extends the row
+            className={`flex gap-[10px] py-[9px] ${editingId === person.id ? 'items-start' : 'items-center'} ${
               i < state.people.length - 1 ? 'border-b border-line' : ''
             }`}
           >
             {/* min-w-0: flex children won't shrink below content width without this */}
             <div className="min-w-0 flex-1">
               {editingId === person.id ? (
-                <input
-                  className="w-full rounded-[9px] border border-line px-[11px] py-[7px] text-ink focus:outline-none focus:ring-2 focus:ring-accent"
-                  value={editName}
-                  onChange={e => setEditName(filterName(e.target.value))}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') commitEdit(person.id)
-                    if (e.key === 'Escape') setEditingId(null)
-                  }}
-                  autoFocus
-                />
+                <>
+                  <input
+                    className="w-full rounded-[9px] border border-line px-[11px] py-[7px] text-ink focus:outline-none focus:ring-2 focus:ring-accent"
+                    value={editName}
+                    onChange={e => { setEditName(filterName(e.target.value)); setEditError(null) }}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') commitEdit(person.id)
+                      if (e.key === 'Escape') { setEditingId(null); setEditError(null) }
+                    }}
+                    autoFocus
+                  />
+                  {editError && (
+                    <p className="mt-[6px] text-[0.8rem] text-owes">{editError}</p>
+                  )}
+                </>
               ) : (
                 <div className="font-medium text-ink">{person.name}</div>
               )}
@@ -95,7 +118,7 @@ export function PeopleList() {
                 </button>
                 <button
                   className="rounded-[8px] border border-line bg-[#fafafa] px-3 py-1 text-sm text-muted hover:bg-[#f0f0f0]"
-                  onClick={() => setEditingId(null)}
+                  onClick={() => { setEditingId(null); setEditError(null) }}
                 >
                   Cancel
                 </button>
@@ -121,20 +144,25 @@ export function PeopleList() {
           </div>
         ))}
 
-        <div className="mt-3 flex gap-2">
-          <input
-            className="w-full rounded-[9px] border border-line px-[11px] py-[9px] text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
-            placeholder="Add a person…"
-            value={newName}
-            onChange={e => setNewName(filterName(e.target.value))}
-            onKeyDown={e => e.key === 'Enter' && addPerson()}
-          />
-          <button
-            className="whitespace-nowrap rounded-[9px] bg-accent px-4 py-[9px] font-semibold text-white hover:brightness-105"
-            onClick={addPerson}
-          >
-            Add
-          </button>
+        <div className="mt-3">
+          <div className="flex gap-2">
+            <input
+              className="w-full rounded-[9px] border border-line px-[11px] py-[9px] text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+              placeholder="New member's name…"
+              value={newName}
+              onChange={e => { setNewName(filterName(e.target.value)); setAddError(null) }}
+              onKeyDown={e => e.key === 'Enter' && addPerson()}
+            />
+            <button
+              className="whitespace-nowrap rounded-[9px] bg-accent px-4 py-[9px] font-semibold text-white hover:brightness-105"
+              onClick={addPerson}
+            >
+              Add
+            </button>
+          </div>
+          {addError && (
+            <p className="mt-[6px] text-[0.8rem] text-owes">{addError}</p>
+          )}
         </div>
       </section>
 
@@ -143,11 +171,11 @@ export function PeopleList() {
         <div className="fixed inset-0 z-10 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-[14px] bg-white p-6 shadow-lg">
             <h3 className="mb-2 mt-0 font-semibold text-ink">
-              Can't remove {blockedPerson.name}
+              Can't remove {blockedPerson.name} yet
             </h3>
             <p className="mb-4 text-sm text-muted">
-              {blockedPerson.name} is referenced in one or more expenses. Delete those
-              expenses first, then remove this person.
+              {blockedPerson.name} is linked to one or more expenses. Remove those
+              expenses first, then you can remove {blockedPerson.name}.
             </p>
             <button
               className="w-full rounded-[9px] bg-accent py-[9px] font-semibold text-white hover:brightness-105"
