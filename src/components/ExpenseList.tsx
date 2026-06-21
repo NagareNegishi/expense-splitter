@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAppContext } from '../lib/context'
 import type { Expense, Person } from '../lib/settlement'
 
@@ -55,6 +55,21 @@ interface ExpenseFormProps {
 /** Shared form used for both adding and editing expenses. */
 function ExpenseForm({ people, initial, submitLabel, onSubmit, onCancel }: ExpenseFormProps) {
   const [form, setForm] = useState<FormState>(initial)
+
+  // When a new person is added while the form is open, auto-select them as a participant.
+  useEffect(() => {
+    setForm(f => {
+      const next = new Set(f.participants)
+      let changed = false
+      for (const p of people) {
+        if (!next.has(p.id)) {
+          next.add(p.id)
+          changed = true
+        }
+      }
+      return changed ? { ...f, participants: next } : f
+    })
+  }, [people])
 
   const amountValid = parseDollars(form.amount) !== null
   const canSubmit =

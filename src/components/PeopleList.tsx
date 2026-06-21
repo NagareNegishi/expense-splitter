@@ -3,6 +3,10 @@ import { useAppContext } from '../lib/context'
 import { canRemovePerson } from '../lib/settlement'
 import type { Person } from '../lib/settlement'
 
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
 /** People section: add, edit, and remove group members with a referential-integrity guard. */
 export function PeopleList() {
   const { state, dispatch } = useAppContext()
@@ -13,7 +17,7 @@ export function PeopleList() {
   const [blockedId, setBlockedId] = useState<string | null>(null)
 
   function addPerson() {
-    const name = newName.trim()
+    const name = capitalize(newName.trim())
     if (!name) return
     dispatch({ type: 'ADD_PERSON', person: { id: crypto.randomUUID(), name } })
     setNewName('')
@@ -25,7 +29,7 @@ export function PeopleList() {
   }
 
   function commitEdit(id: string) {
-    const name = editName.trim()
+    const name = capitalize(editName.trim())
     if (name) dispatch({ type: 'EDIT_PERSON', id, name })
     setEditingId(null)
   }
