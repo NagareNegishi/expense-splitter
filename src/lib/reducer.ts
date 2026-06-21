@@ -1,4 +1,5 @@
 import type { State, Person, Expense, ID } from './settlement';
+import { canRemovePerson } from './settlement';
 
 // All the things a user can do. Add a variant here and TypeScript will force you to handle it in the reducer.
 export type Action =
@@ -26,6 +27,7 @@ export function reducer(state: State, action: Action): State {
       };
     }
     case 'REMOVE_PERSON': {
+      if (!canRemovePerson(state, action.id)) return state;
       return { ...state, people: state.people.filter(p => p.id !== action.id) };
     }
     case 'ADD_EXPENSE': {

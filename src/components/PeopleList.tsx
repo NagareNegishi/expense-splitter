@@ -78,12 +78,20 @@ export function PeopleList() {
             </div>
 
             {editingId === person.id ? (
-              <button
-                className="rounded-[8px] border border-line bg-[#fafafa] px-3 py-1 text-sm text-muted hover:bg-[#f0f0f0]"
-                onClick={() => commitEdit(person.id)}
-              >
-                Save
-              </button>
+              <div className="flex gap-2">
+                <button
+                  className="rounded-[8px] border border-line bg-[#fafafa] px-3 py-1 text-sm text-muted hover:bg-[#f0f0f0]"
+                  onClick={() => commitEdit(person.id)}
+                >
+                  Save
+                </button>
+                <button
+                  className="rounded-[8px] border border-line bg-[#fafafa] px-3 py-1 text-sm text-muted hover:bg-[#f0f0f0]"
+                  onClick={() => setEditingId(null)}
+                >
+                  Cancel
+                </button>
+              </div>
             ) : (
               <>
                 <button
