@@ -6,15 +6,13 @@ Split shared group expenses and see who owes whom.
 
 ## Setup
 
-Requires Node 24 (see `.nvmrc`). If you don't have it, install from [nodejs.org](https://nodejs.org).
+Requires Node 24. If you don't have it, the easiest path is to open the repo in VS Code with the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension — it builds the right environment automatically. Otherwise, install Node 24 from [nodejs.org](https://nodejs.org).
 
 ```bash
 npm install
 npm run dev      # serves at http://localhost:5173
 npm test         # runs the settlement tests
 ```
-
-`.devcontainer/` is the development environment used during the build. It is not needed to run the app.
 
 ---
 
