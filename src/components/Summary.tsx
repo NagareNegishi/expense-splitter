@@ -6,16 +6,29 @@ function centsToDisplay(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`
 }
 
+interface SummaryProps {
+  selectedExpenseIds: Set<string>
+}
+
 /**
  * Summary section: shows each person's net balance and the greedy settle-up list.
  * Both are derived fresh every render — nothing is stored in state.
  */
-export function Summary() {
+export function Summary({ selectedExpenseIds }: SummaryProps) {
   const { state } = useAppContext()
 
+  const filteredState = {
+    ...state,
+    expenses: state.expenses.filter(e => selectedExpenseIds.has(e.id)),
+  }
+
   // Derive balances and transactions on every render; no stale state to manage
-  const balances = computeNetBalances(state)
+  const balances = computeNetBalances(filteredState)
   const transactions = computeTransactions(balances)
+
+  const selectedCount = filteredState.expenses.length
+  const totalCount = state.expenses.length
+  const isFiltered = selectedCount < totalCount
 
   function nameOf(id: string): string {
     return state.people.find(p => p.id === id)?.name ?? '?'
@@ -34,9 +47,14 @@ export function Summary() {
 
   return (
     <section className="rounded-[14px] border border-line bg-white p-5">
-      <h2 className="mb-3 mt-0 border-b border-line pb-2 text-[0.9rem] font-semibold text-ink">
-        Summary
-      </h2>
+      <div className="mb-3 flex items-baseline justify-between border-b border-line pb-2">
+        <h2 className="m-0 text-[0.9rem] font-semibold text-ink">Summary</h2>
+        {isFiltered && (
+          <span className="text-[0.75rem] text-muted">
+            {selectedCount} of {totalCount} expenses
+          </span>
+        )}
+      </div>
 
       {/* Block 1: per-person net balance */}
       <div>

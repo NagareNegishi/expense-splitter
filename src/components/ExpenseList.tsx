@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAppContext } from '../lib/context'
 import type { Expense, Person } from '../lib/settlement'
 
@@ -126,13 +126,23 @@ function ExpenseForm({ people, initial, submitLabel, onSubmit, onCancel }: Expen
   const inputClass =
     'w-full rounded-[9px] border border-line px-[11px] py-[9px] text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent'
 
+  const COMMON_DESCRIPTIONS = [
+    'Dinner', 'Lunch', 'Breakfast', 'Coffee', 'Drinks',
+    'Groceries', 'Takeaway', 'Taxi', 'Uber', 'Petrol',
+    'Hotel', 'Activities',
+  ]
+
   return (
     <div>
       <div className="mb-[10px]">
         <label className={labelClass}>Description</label>
+        <datalist id="description-suggestions">
+          {COMMON_DESCRIPTIONS.map(s => <option key={s} value={s} />)}
+        </datalist>
         <input
           className={inputClass}
           placeholder="e.g. Dinner"
+          list="description-suggestions"
           value={form.description}
           onChange={e => setForm(f => ({ ...f, description: filterDescription(e.target.value) }))}
         />
@@ -210,12 +220,28 @@ function ExpenseForm({ people, initial, submitLabel, onSubmit, onCancel }: Expen
   )
 }
 
+interface ExpenseListProps {
+  selectedExpenseIds: Set<string>
+  onToggleExpense: (id: string) => void
+  onSetAll: (checked: boolean) => void
+}
+
 /** Expense list with inline edit and the add-expense form at the bottom. */
-export function ExpenseList() {
+export function ExpenseList({ selectedExpenseIds, onToggleExpense, onSetAll }: ExpenseListProps) {
   const { state, dispatch } = useAppContext()
   const [editingId, setEditingId] = useState<string | null>(null)
   // Incrementing this key forces the add form to remount (and reset) after each successful add
   const [addFormKey, setAddFormKey] = useState(0)
+  const selectAllRef = useRef<HTMLInputElement>(null)
+
+  const allSelected = state.expenses.length > 0 && state.expenses.every(e => selectedExpenseIds.has(e.id))
+  const someSelected = state.expenses.some(e => selectedExpenseIds.has(e.id))
+
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = someSelected && !allSelected
+    }
+  }, [someSelected, allSelected])
 
   const allIds = state.people.map(p => p.id)
   const defaultPaidBy = allIds[0] ?? ''
@@ -254,9 +280,23 @@ export function ExpenseList() {
 
   return (
     <section className="mb-4 rounded-[14px] border border-line bg-white p-5">
-      <h2 className="mb-3 mt-0 border-l-[3px] border-accent pl-3 text-[0.9rem] font-semibold text-ink">
-        Expenses
-      </h2>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="m-0 border-l-[3px] border-accent pl-3 text-[0.9rem] font-semibold text-ink">
+          Expenses
+        </h2>
+        {state.expenses.length > 0 && (
+          <label className="flex cursor-pointer items-center gap-[6px] text-[0.8rem] text-muted">
+            <input
+              ref={selectAllRef}
+              type="checkbox"
+              className="accent-accent"
+              checked={allSelected}
+              onChange={e => onSetAll(e.target.checked)}
+            />
+            All
+          </label>
+        )}
+      </div>
 
       {state.expenses.map((expense, i) => {
         const isLast = i === state.expenses.length - 1
@@ -271,6 +311,12 @@ export function ExpenseList() {
                 !isLast || isEditing ? 'border-b border-line' : ''
               }`}
             >
+              <input
+                type="checkbox"
+                className="accent-accent shrink-0"
+                checked={selectedExpenseIds.has(expense.id)}
+                onChange={() => onToggleExpense(expense.id)}
+              />
               {/* min-w-0: prevents the description/sub-line from overflowing its flex cell */}
               <div className="min-w-0 flex-1">
                 <div className="truncate font-medium text-ink">{expense.description}</div>

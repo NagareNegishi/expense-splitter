@@ -1,7 +1,53 @@
+import { useEffect, useState } from 'react'
 import { AppProvider } from './lib/context'
+import { useAppContext } from './lib/context'
 import { PeopleList } from './components/PeopleList'
 import { ExpenseList } from './components/ExpenseList'
 import { Summary } from './components/Summary'
+
+function AppContent() {
+  const { state } = useAppContext()
+  const [selectedExpenseIds, setSelectedExpenseIds] = useState<Set<string>>(
+    () => new Set(state.expenses.map(e => e.id))
+  )
+
+  // Auto-select newly added expenses; drop IDs for deleted ones
+  useEffect(() => {
+    const currentIds = new Set(state.expenses.map(e => e.id))
+    setSelectedExpenseIds(prev => {
+      const next = new Set([...prev].filter(id => currentIds.has(id)))
+      for (const id of currentIds) {
+        if (!prev.has(id)) next.add(id)
+      }
+      return next
+    })
+  }, [state.expenses])
+
+  function toggleExpense(id: string) {
+    setSelectedExpenseIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function setAll(checked: boolean) {
+    setSelectedExpenseIds(checked ? new Set(state.expenses.map(e => e.id)) : new Set())
+  }
+
+  return (
+    <>
+      <PeopleList />
+      <ExpenseList
+        selectedExpenseIds={selectedExpenseIds}
+        onToggleExpense={toggleExpense}
+        onSetAll={setAll}
+      />
+      <Summary selectedExpenseIds={selectedExpenseIds} />
+    </>
+  )
+}
 
 function App() {
   return (
@@ -17,9 +63,7 @@ function App() {
               Record shared expenses, see who owes whom.
             </p>
           </header>
-          <PeopleList />
-          <ExpenseList />
-          <Summary />
+          <AppContent />
         </div>
       </div>
     </AppProvider>
