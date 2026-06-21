@@ -173,6 +173,42 @@ describe('removal guard', () => {
   });
 });
 
+// ─── 7. Partial expense selection ───────────────────────────────────────────
+
+describe('partial expense selection', () => {
+  // Two expenses; balances and transactions should reflect only the selected one.
+  const allExpenses = [
+    { id: 'e1', description: 'Dinner', amountCents: 3000, paidBy: alice, participants: [alice, bob, carol] },
+    { id: 'e2', description: 'Taxi', amountCents: 1500, paidBy: bob, participants: [alice, bob] },
+  ];
+
+  const fullState: State = { people: people(alice, bob, carol), expenses: allExpenses };
+  const partialState: State = { ...fullState, expenses: [allExpenses[0]] };
+
+  it('balances with only e1 match a state that only contains e1', () => {
+    const full = computeNetBalances(fullState);
+    const partial = computeNetBalances(partialState);
+    // They must differ — e2 changes bob's and alice's balances
+    expect(full.get(bob)).not.toBe(partial.get(bob));
+  });
+
+  it('selecting only e1: bob and carol each owe alice 1000 cents', () => {
+    const balances = computeNetBalances(partialState);
+    expect(balances.get(alice)).toBe(2000);
+    expect(balances.get(bob)).toBe(-1000);
+    expect(balances.get(carol)).toBe(-1000);
+  });
+
+  it('selecting no expenses: everyone nets to zero', () => {
+    const emptyState: State = { ...fullState, expenses: [] };
+    const balances = computeNetBalances(emptyState);
+    expect(balances.get(alice)).toBe(0);
+    expect(balances.get(bob)).toBe(0);
+    expect(balances.get(carol)).toBe(0);
+    expect(computeTransactions(balances)).toHaveLength(0);
+  });
+});
+
 // ─── 7. Debt chain collapses ────────────────────────────────────────────────
 
 describe('debt chain', () => {
