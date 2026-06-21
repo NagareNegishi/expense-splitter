@@ -1,43 +1,73 @@
-# Expense Splitter
+# React + TypeScript + Vite
 
-<!-- FILL: one line on what the app does, e.g. "Split shared group expenses and see who owes whom." -->
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Setup
+Currently, two official plugins are available:
 
-<!-- FILL: confirm the pinned Node version (.nvmrc) and the dev URL against the real build. Commands only. -->
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-Requires Node `<NODE_VERSION>` (see `.nvmrc`).
+## React Compiler
 
-```bash
-npm install
-npm run dev      # serves at <LOCAL_URL>
-npm test         # runs the settlement tests
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-`.devcontainer/` is the development environment. It is not needed to run the app.
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-## Architecture
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-<!-- FILL: name the two layers and where the settlement logic lives (lib/settlement.ts).
-     State that it has no framework or UI imports and its tests run in plain Node. Two or three sentences. -->
-
-## Settlement
-
-<!-- FILL: brief. Money is integer cents. Per expense, leftover cents are handed out one each
-     to non-payers first, so shares sum back to the exact amount. Who-pays-whom is greedy and
-     near-minimal, not guaranteed minimal. Point to DECISIONS.md for the full reasoning. -->
-
-## Assumptions
-
-<!-- FILL: NZ dollars, single group, in-memory state (resets on refresh), even split across the
-     chosen participants. Half a sentence on why an expense can be shared by a subset rather than
-     always everyone. -->
-
-## What I'd do next
-
-<!-- FILL: uneven splits, persistence (if not done), UX polish. List only what is not finished. -->
-
-## See also
-
-- `DECISIONS.md` — decision log and full reasoning.
-- <!-- FILL: link to the written answers doc. -->
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
